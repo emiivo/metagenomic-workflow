@@ -17,29 +17,30 @@ DOWNLOAD_ASSEMBLY_QC = download_assembly_qc.py
 TAXONOMY_STEP_ONE = taxonomy_step_one.py
 TAXONOMY_STEP_TWO = taxonomy_translate.py
 TAXONOMY_DOWNLOAD = download_taxonomy.py
+TAXONOMY_RESULTS = taxonomy_final.sh
 
 # Default target to run the entire workflow
 all: download_data QC trim upload_to_ftp upload_to_galaxy \
      assemble assembly_qc download_assembly_qc taxonomy_one \
-     taxonomy_translate taxonomy_download
+     taxonomy_translate download_taxonomy taxonomy_result
      
 # Target to run the workflow after galaxy upload - assembly,
 # assembly qc, taxonomy
 process_in_galaxy: assemble assembly_qc download_assembly_qc taxonomy_one \
-     taxonomy_translate taxonomy_download
+     taxonomy_translate download_taxonomy taxonomy_result
      
 # Target to run the workflow after assembly -
 # assembly qc, taxonomy 
 after_assembly: assembly_qc download_assembly_qc taxonomy_one \
-     taxonomy_translate taxonomy_download  
+     taxonomy_translate download_taxonomy taxonomy_result
 
 # Target to run the workflow after assembly qc - taxonomy    
 after_assembly_qc: download_assembly_qc taxonomy_one \
-     taxonomy_translate taxonomy_download  
+     taxonomy_translate download_taxonomy taxonomy_result  
      
 # Target to run the workflow after running kraken - translate 
 # and download  
-after_assembly_qc: taxonomy_translate taxonomy_download
+after_assembly_qc: taxonomy_translate download_taxonomy taxonomy_result
 
 # Download data target
 download_data:
@@ -86,9 +87,13 @@ taxonomy_translate:
 	chmod +x $(TAXONOMY_STEP_TWO)
 	./$(TAXONOMY_STEP_TWO)	
 	
-taxonomy_download:
+download_taxonomy:
 	chmod +x $(TAXONOMY_DOWNLOAD)
 	./$(TAXONOMY_DOWNLOAD)	
+	
+taxonomy_result:
+	chmod +x $(TAXONOMY_RESULTS)
+	./$(TAXONOMY_RESULTS)		
 
 # Clean target to remove downloaded files
 clean:

@@ -24,7 +24,6 @@ def check_jobs_completion(gi, history_id, dataset_ids):
         statuses.append((dsid, state, state == "ok"))
     return statuses
 
-
 if not os.path.exists(API_KEY_FILE) or not os.path.exists(ACCESSION_FILE):
     log("ERROR: Missing API key or accession file.")
     exit(1)
@@ -47,58 +46,73 @@ log(f"Using history '{history_name}' (ID: {history_id})")
 
 # Get datasets containing "Classification"
 history_contents = gi.histories.show_history(history_id, contents=True)
-classification_datasets = {
-    item["name"]: item["id"]
-    for item in history_contents
+classification_datasets = [
+    item for item in history_contents
     if item["history_content_type"] == "dataset" and "Classification" in item["name"]
-}
+]
 
 if not classification_datasets:
     log("ERROR: No datasets with 'Classification' found.")
     exit(1)
 
-log(f"Found Classification datasets: {list(classification_datasets.keys())}")
+# Log the found datasets
+log(f"Found Classification datasets:")
+for item in classification_datasets:
+    log(f"  {item['name']} (ID: {item['id']})")
 
-# Submit Kraken Translate jobs
+# Find Kraken database
+def find_kraken_database(dataset_info):
+    job_id = dataset_info.get('creating_job')
+    if job_id:
+        job_info = gi.jobs.show_job(job_id)
+        log(f"Job info: {job_info}")
+        
+        job_params = job_info.get('params', {})
+        log(f"Job params: {job_params}")
+        
+        kraken_db = job_params.get('kraken_database')
+        if kraken_db:
+            # Remove spaces and quotes
+            kraken_db = kraken_db.strip().strip('"')
+            log(f"  Found Kraken database: {kraken_db}")
+            return kraken_db
+        else:
+            log("  ERROR: Kraken database not found in job params.")
+    else:
+        log(f"  ERROR: No job information found for dataset {dataset_info['name']}.")
+
+    return None
+
+# Submit Kraken Translate
 submitted_jobs = []
-for name, dataset_id in classification_datasets.items():
-    log(f"Submitting Kraken Translate for '{name}'")
+for item in classification_datasets:
+    name = item["name"]
+    dataset_id = item["id"]
+    log(f"Submitting Kraken Translate for '{name}' (ID: {dataset_id})")
 
     dataset_info = gi.histories.show_dataset(history_id, dataset_id)
-    job_id = dataset_info.get("creating_job")
-
-    if not job_id:
-        log(f"  ERROR: Could not find creating job for '{name}'.")
+    
+    # Find Kraken database from job parameters
+    kraken_db = find_kraken_database(dataset_info)
+    
+    if not kraken_db:
+        log(f"  ERROR: Could not determine Kraken database for '{name}' (ID: {dataset_id}).")
         continue
 
-    try:
-        job_info = gi.jobs.show_job(job_id)
-        kraken_inputs = job_info.get("inputs", {})
-        kraken_db = kraken_inputs.get("kraken_database", {}).get("value")
+    inputs = {
+        "kraken_database": kraken_db,
+        "input": { "src": "hda", "id": dataset_id }
+    }
 
-        if not kraken_db:
-            log(f"  ERROR: Could not determine Kraken database for '{name}'.")
-            continue
+    response = gi.tools.run_tool(
+        history_id=history_id,
+        tool_id=KRAKEN_TRANSLATE_TOOL_ID,
+        tool_inputs=inputs
+    )
 
-        log(f"  Detected Kraken database: {kraken_db}")
-
-        inputs = {
-            "kraken_database": kraken_db,
-            "input": { "src": "hda", "id": dataset_id }
-        }
-
-        response = gi.tools.run_tool(
-            history_id=history_id,
-            tool_id=KRAKEN_TRANSLATE_TOOL_ID,
-            tool_inputs=inputs
-        )
-
-        output_ids = [output["id"] for output in response["outputs"]]
-        log(f"  Submitted job for '{name}' -> Outputs: {output_ids}")
-        submitted_jobs.extend(output_ids)
-
-    except Exception as e:
-        log(f"  ERROR submitting Kraken Translate for '{name}': {e}")
+    output_ids = [output["id"] for output in response["outputs"]]
+    log(f"  Submitted job for '{name}' (ID: {dataset_id}) -> Outputs: {output_ids}")
+    submitted_jobs.extend(output_ids)
 
 # Check if it's completed
 if not submitted_jobs:
