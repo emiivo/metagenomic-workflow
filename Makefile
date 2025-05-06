@@ -40,7 +40,7 @@ after_assembly_qc: download_assembly_qc taxonomy_one \
      
 # Target to run the workflow after running kraken - translate 
 # and download  
-after_assembly_qc: taxonomy_translate download_taxonomy taxonomy_result
+after_kraken: taxonomy_translate download_taxonomy taxonomy_result
 
 # Download data target
 download_data:
