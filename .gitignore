@@ -4,4 +4,6 @@ download/sra_accessions.txt
 
 download/accession.txt
 
-galaxy/
+galaxy/account.txt
+
+galaxy/key.txt
