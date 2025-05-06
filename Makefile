@@ -4,8 +4,7 @@
 INPUTS_DIR = ../inputs
 OUTPUTS_DIR = ../outputs 
 SRA_ACCESSION_FILE = download/sra_accessions.txt
-ACCESSION_FILE = download/accession.txt
-DOWNLOAD_SCRIPT = download/download.sh
+DOWNLOAD_SCRIPT = download.sh
 QC_SCRIPT = quality_control.sh
 TRIM_SCRIPT = trimming.sh
 QC_AFTER_SCRIPT = quality_after_trim.sh
@@ -44,8 +43,7 @@ after_kraken: taxonomy_translate download_taxonomy taxonomy_result
 
 # Download data target
 download_data:
-	chmod +x $(DOWNLOAD_SCRIPT)
-	cd download && ./$(DOWNLOAD_SCRIPT)
+	cd download && chmod +x $(DOWNLOAD_SCRIPT) && ./$(DOWNLOAD_SCRIPT)
 	
 QC:
 	chmod +x $(QC_SCRIPT)
