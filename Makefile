@@ -3,6 +3,7 @@
 # Define the script and files
 INPUTS_DIR = ../inputs
 OUTPUTS_DIR = ../outputs
+GALAXY_DIR = galaxy
 SRA_ACCESSION_FILE = download/sra_accessions.txt
 DOWNLOAD_ACCESSION_FILE = download/accession.txt
 DOWNLOAD_LOG = download/download.log
@@ -94,10 +95,11 @@ taxonomy_result:
 	chmod +x $(TAXONOMY_RESULTS)
 	./$(TAXONOMY_RESULTS)		
 
-# Clean target to remove downloaded files
+# Clean target to remove input and output files
 clean:
 	rm -rf $(INPUTS_DIR)/*
 	rm -rf $(OUTPUTS_DIR)/*
+	rm -rf $(GALAXY_DIR)/*
 	rm -f $(SRA_ACCESSION_FILE)
 	rm -f $(DOWNLOAD_ACCESSION_FILE)
 	rm -f $(DOWNLOAD_LOG)
