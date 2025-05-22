@@ -8,6 +8,11 @@ Important: Clone this repository into an empty directory, as the workflow create
 
 git clone https://github.com/emiivo/metagenomic-workflow
 
+## Dependencies
+
+Please install these tools before running the workflow:
+**FastQC**, **MultiQC**, **Fastp**
+
 ## Required Input Files
 
 Before running the pipeline, add the following files:
