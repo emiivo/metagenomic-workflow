@@ -2,9 +2,10 @@
 
 # Define the script and files
 INPUTS_DIR = ../inputs
-OUTPUTS_DIR = ../outputs 
+OUTPUTS_DIR = ../outputs
 SRA_ACCESSION_FILE = download/sra_accessions.txt
-DOWNLOAD_SCRIPT = download.sh
+DOWNLOAD_ACCESSION_FILE = download/accession.txt
+DOWNLOAD_LOG = download/download.log
 QC_SCRIPT = quality_control.sh
 TRIM_SCRIPT = trimming.sh
 QC_AFTER_SCRIPT = quality_after_trim.sh
@@ -98,13 +99,9 @@ clean:
 	rm -rf $(INPUTS_DIR)/*
 	rm -rf $(OUTPUTS_DIR)/*
 	rm -f $(SRA_ACCESSION_FILE)
+	rm -f $(DOWNLOAD_ACCESSION_FILE)
+	rm -f $(DOWNLOAD_LOG)
 
-# Distclean target to remove everything
+# Distclean
 distclean: clean
-	rm -f $(DOWNLOAD_SCRIPT)
-	rm -f $(QC_SCRIPT)
-	rm -f $(TRIM_SCRIPT)	
-	rm -f $(QC_AFTER_SCRIPT)
-	rm -f $(UPLOAD_FTP_SCRIPT)		
-	rm -f $(UPLOAD_GALAXY_SCRIPT)	
-	rm -f $(ASSEMBLY_SCRIPT)	
+	@echo "Everything cleaned except source scripts."
