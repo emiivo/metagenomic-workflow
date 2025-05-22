@@ -115,7 +115,7 @@ while True:
     status  = all_done(gi, hid, jobs)
     pending = [(d,s) for (d,s,ok) in status if not ok]
     for d,s,ok in status:
-        log(f"  {d}: {s}{' OK' if ok else ''}")
+        log(f"  {d}: {s}")
     if not pending:
         break
     log(f"{len(pending)} still running…")

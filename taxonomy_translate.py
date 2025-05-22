@@ -125,7 +125,7 @@ while True:
     job_statuses = check_jobs_completion(gi, history_id, submitted_jobs)
     pending_jobs = [(dsid, state) for dsid, state, is_ok in job_statuses if not is_ok]
     for dsid, state, is_ok in job_statuses:
-        log(f"  Dataset {dsid}: {state}{''}")
+        log(f"  Dataset {dsid}: {state}")
     if not pending_jobs:
         break
     log(f"{len(pending_jobs)} job(s) still running...")
