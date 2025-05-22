@@ -26,12 +26,6 @@ You will be asked for:
 - Your Galaxy password during the upload_to_ftp step.
 - The databases to use for taxonomy (Viral, Bacteria, Plasmid, Archaea).
 
-## Running the Workflow
-
-To run everything:
-
-make
-
 ## Makefile Targets
 
 ### Full Workflow
